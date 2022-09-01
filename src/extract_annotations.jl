@@ -1,19 +1,17 @@
 
+Annotation = NamedTuple{(:text, :type), Tuple{AbstractString, Symbol}}
+make_at_annotation(text::AbstractString) = (text = text, type = :at)
+make_tag_annotation(text::AbstractString) = (text = text, type = :tag)
+
 function extract_annotations(text::AbstractString)
     matches = Vector()
     for match ∈ eachmatch(r"(^|\s)([@#])((\w|-)+)", text)
         annotation_text = lowercase(match[3])
         if (match[2] == "@") 
-            push!(matches, (
-                text = annotation_text,
-                type = :at
-            ))
+            push!(matches, make_at_annotation(annotation_text))
         end
         if (match[2] == "#") 
-            push!(matches, (
-                text = annotation_text,
-                type = :tag
-            ))
+            push!(matches, make_tag_annotation(annotation_text))
         end
     end
 
@@ -37,7 +35,7 @@ function extract_annotations(parts::Vector)
 end
 
 function extract_annotations(part::Any)
-    if MarkdownIndexer.warn_about_unhandled_parts
+    if Zettlekasten.warn_about_unhandled_parts
         part_type = typeof(part)
         @warn "Unhandled segment type: $part_type"
     end
