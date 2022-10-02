@@ -1,4 +1,3 @@
-
 function collate(parts::Vector)
     text_parts = parts .|> p -> !(typeof(p) <: AbstractString) ? collate(p) : p
     string(text_parts...)

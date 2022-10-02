@@ -1,26 +1,21 @@
-
-Annotation = NamedTuple{(:text, :type), Tuple{AbstractString, Symbol}}
-make_at_annotation(text::AbstractString) = (text = text, type = :at)
-make_tag_annotation(text::AbstractString) = (text = text, type = :tag)
+const annotation_pattern = r"(^|\s)([@#])((\w|-)+)(\:((\w|-)+))?"
 
 function extract_annotations(text::AbstractString)
-    matches = Vector()
-    for match ∈ eachmatch(r"(^|\s)([@#])((\w|-)+)", text)
+    matches = Vector{Annotation}()
+    for match ∈ eachmatch(annotation_pattern, text)
         annotation_text = lowercase(match[3])
+
+        annotation_value = match[6]
+        if annotation_value !== nothing
+            annotation_value = lowercase(annotation_value)
+        end
+
         if (match[2] == "@") 
-            push!(matches, make_at_annotation(annotation_text))
+            push!(matches, Annotation(at, annotation_text, annotation_value))
         end
         if (match[2] == "#") 
-            push!(matches, make_tag_annotation(annotation_text))
+            push!(matches, Annotation(tag, annotation_text, annotation_value))
         end
-    end
-
-    for match ∈ eachmatch(r"\[\[(.+)\]\]", text)
-        annotation_text = lowercase(match[1])
-        push!(matches, (
-            text = annotation_text,
-            type = :link
-        ))
     end
 
     return matches
