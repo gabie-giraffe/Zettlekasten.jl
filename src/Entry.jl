@@ -1,4 +1,5 @@
 mutable struct Entry
+    uuid::UUID
     title::Union{Nothing, AbstractString}
     content::Vector{Any}
     annotations::Vector{Annotation}
@@ -15,7 +16,7 @@ mutable struct Entry
         title = nothing,
         source = nothing,
         subentries = Vector{Entry}()
-    ) = new(title, content, annotations, date, source, subentries)
+    ) = new(uuid4(), title, content, annotations, date, source, subentries)
 end
 
 Base.copy(entry::Entry) = Entry(
